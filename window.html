@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Demo</title>
+</head>
+<body>
+<h1>JavaScript Impement Window Sample</h1>
+
+<div class="window">
+    <div>
+        <span class="close"></span>
+    </div>
+    <div>
+        <span class="resizer"></span>
+    </div>
+</div>
+    
+<style>
+    .window {
+        width: 300px;
+        height: 200px;
+        background-color: silver;
+        position: absolute;
+    }
+
+    .window > div {
+        width: 100%;
+    }
+
+    .window > div:first-child {
+        height: 30px;
+        background-color: green;
+    }
+
+    .window > div:first-child > span.close {
+        float: right;
+        cursor: pointer;
+        height: 30px;
+        width: 30px;
+        display: inline-block;
+        background-color: blue;
+    }
+
+    .window > div:last-child > span.resizer {
+        float: right;
+        cursor: pointer;
+        height: 30px;
+        width: 30px;
+        display: inline-block;
+        background-color: blue;
+        position: absolute;
+        bottom: 0px;
+        right: 0px;
+    }
+</style>
+
+<script>
+
+    var mousedown = function(e){
+        // unbind trigger event
+        document.addEventListener('mouseup', mouseup, false);
+        document.addEventListener('mousemove', mousemove, false);
+
+        // set current active window to pointer
+        document.current_window = e.target.parentElement;
+
+        // start mouse pos
+        document.current_window.origin_cli_pos = {
+            x: e.clientX,
+            y: e.clientY
+        };
+
+        // new api get box bounding(object current client position description)
+        var box_bounding = document.current_window.getBoundingClientRect();
+
+        // start ele pos
+        document.current_window.origin_pos = {
+            // x: parseInt(document.current_window.style.left == '' ? 0 : document.current_window.style.left),
+            x: box_bounding.left,
+            // y: parseInt(document.current_window.style.top == '' ? 0 : document.current_window.style.top)
+            y: box_bounding.top
+        }
+    };
+
+    var mousemove = function(e){
+        // calculate offset value
+        new_pos_incr = {
+            x: e.clientX - document.current_window.origin_cli_pos.x,
+            y: e.clientY - document.current_window.origin_cli_pos.y
+        }
+
+        // add offset value to element position
+        document.current_window.style.left = document.current_window.origin_pos.x + new_pos_incr.x + 'px';
+        document.current_window.style.top = document.current_window.origin_pos.y + new_pos_incr.y + 'px';
+    };
+
+    var mouseup = function(e){
+        document.removeEventListener('mousemove', mousemove);
+    };
+
+    // add script to window component
+    var cmp = document.querySelector('div.window');
+    cmp.querySelector('div:first-child').addEventListener('mousedown', mousedown, false);
+    cmp.querySelector('div:first-child').removeEventListener('mouseup', mouseup, false);
+
+    cmp.querySelector('div:first-child>span.close').addEventListener('click', function(e){cmp.remove()});    
+</script>
+
+</body>
+</html>
